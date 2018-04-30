@@ -1,6 +1,7 @@
 package com.example.asnaui.mobiledtr;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,37 +46,42 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     @Override
     public void onAuthenticationError(int errMsgId,
                                       CharSequence errString) {
-        Toast.makeText(appContext,
-                "Authentication error\n" + errString,
-                Toast.LENGTH_LONG).show();
         AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
-        builder.setTitle("Error");
-        builder.setMessage("Authentication Error, Please try again");
+        builder.setMessage(errString.toString());
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                startAuth(mManager,mCryptoObject);
+               // startAuth(mManager, mCryptoObject);
+                scannerDialog("Please put your registered finger on the sensor");
             }
         });
-        Dialog dialog = builder.create();
-        dialog.show();
+      Dialog dialog = builder.create();
+      dialog.show();
+    }
+
+    public void scannerDialog(String message) {
+        Toast.makeText(appContext,message,Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onAuthenticationHelp(int helpMsgId,
                                      CharSequence helpString) {
-        Toast.makeText(appContext,
-                "Authentication help\n" + helpString,
-                Toast.LENGTH_LONG).show();
-        startAuth(mManager,mCryptoObject);
+        scannerDialog(""+helpString);
     }
 
     @Override
     public void onAuthenticationFailed() {
-        Toast.makeText(appContext,
-                "Authentication failed.",
-                Toast.LENGTH_LONG).show();
-        startAuth(mManager,mCryptoObject);
+        AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
+        builder.setMessage("Access denied");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+              //  startAuth(mManager, mCryptoObject);
+                scannerDialog("Please put your registered finger on the sensor");
+            }
+        });
+        Dialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override
@@ -87,6 +93,5 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
                 Toast.LENGTH_LONG).show();
         Intent intent = new Intent(appContext, Home.class);
         appContext.startActivity(intent);
-        startAuth(mManager,mCryptoObject);
     }
 }

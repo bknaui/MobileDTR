@@ -7,11 +7,12 @@ import java.util.ArrayList;
  */
 
 public class DtrDate {
-    public String date;
-    public ArrayList<DtrTime> time;
+    public String date, id;
+    public ArrayList<DtrTime> list;
 
-    public DtrDate(String date, ArrayList<DtrTime> time) {
+    public DtrDate(String id, String date, ArrayList<DtrTime> list) {
+        this.id = id;
         this.date = date;
-        this.time = time;
+        this.list = list;
     }
 }

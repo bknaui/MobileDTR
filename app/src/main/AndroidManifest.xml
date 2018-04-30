@@ -3,7 +3,9 @@
     package="com.example.asnaui.mobiledtr">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+
 
     <application
         android:allowBackup="true"
@@ -12,6 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/api_key" />
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="face" />
@@ -27,8 +32,12 @@
         <activity
             android:name=".Home"
             android:screenOrientation="portrait"></activity>
-
-        <service android:name=".GeofenceTransitionsIntentService" />
+        <receiver
+            android:name=".MyBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.location.PROVIDERS_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -5,11 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.asnaui.mobiledtr.Object.DtrDate;
+import com.example.asnaui.mobiledtr.Object.DtrTime;
 import com.example.asnaui.mobiledtr.R;
 
 import java.util.ArrayList;
@@ -19,24 +19,25 @@ import java.util.ArrayList;
  */
 
 public class DtrListAdapter extends BaseAdapter {
-    ArrayList<DtrDate> list;
+    ArrayList<DtrDate> dateList;
     Context context;
     LayoutInflater layoutInflater;
+    String flagger = "";
 
-    public DtrListAdapter(ArrayList<DtrDate> list, Context context) {
-        this.list = list;
+    public DtrListAdapter(ArrayList<DtrDate> dateList, Context context) {
+        this.dateList = dateList;
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
     }
 
     @Override
     public int getCount() {
-        return list.size();
+        return dateList.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return list.get(i);
+        return dateList.get(i);
     }
 
     @Override
@@ -46,10 +47,40 @@ public class DtrListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+        Handler handler;
         if (view == null) {
-            view = layoutInflater.inflate(R.layout.dtr_item_layout, null, false);
+            handler = new Handler();
+            view = layoutInflater.inflate(R.layout.dtr_item_template, null, false);
+            handler.container = view.findViewById(R.id.time_logs);
+            handler.date = view.findViewById(R.id.date);
+            view.setTag(handler);
+        } else handler = (Handler) view.getTag();
+
+        if (!flagger.equalsIgnoreCase(dateList.get(i).date)) {
+            flagger = dateList.get(i).date;
+            handler.date.setText(flagger);
         }
+        if (handler.container.getChildCount() == 0) {
+            for (int z = 0; z < dateList.get(i).list.size(); z++) {
+                handler.container.addView(TimeLogs(dateList.get(i).list.get(z).time, dateList.get(i).list.get(z).status));
+            }
+        }
+
         return view;
+    }
+
+    public View TimeLogs(String time, String status) {
+        View view = layoutInflater.inflate(R.layout.logs_item_template, null, false);
+        TextView mTime = view.findViewById(R.id.time);
+        TextView mStatus = view.findViewById(R.id.status);
+        mTime.setText(time);
+        mStatus.setText(status);
+        return view;
+    }
+
+    static class Handler {
+        LinearLayout container;
+        TextView date;
     }
 
 }

@@ -5,9 +5,10 @@ package com.example.asnaui.mobiledtr.Object;
  */
 
 public class DtrTime {
-    public String time, status;
+    public String date,time, status;
 
-    public DtrTime(String time, String status) {
+    public DtrTime(String date,String time, String status) {
+        this.date = date;
         this.time = time;
         this.status = status;
     }
