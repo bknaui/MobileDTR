@@ -8,8 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.asnaui.mobiledtr.Object.DtrDate;
-import com.example.asnaui.mobiledtr.Object.DtrTime;
+import com.example.asnaui.mobiledtr.DailyTimeRecord.DTRDate;
 import com.example.asnaui.mobiledtr.R;
 
 import java.util.ArrayList;
@@ -19,12 +18,12 @@ import java.util.ArrayList;
  */
 
 public class DtrListAdapter extends BaseAdapter {
-    ArrayList<DtrDate> dateList;
+    ArrayList<DTRDate> dateList;
     Context context;
     LayoutInflater layoutInflater;
     String flagger = "";
 
-    public DtrListAdapter(ArrayList<DtrDate> dateList, Context context) {
+    public DtrListAdapter(ArrayList<DTRDate> dateList, Context context) {
         this.dateList = dateList;
         this.context = context;
         layoutInflater = LayoutInflater.from(context);

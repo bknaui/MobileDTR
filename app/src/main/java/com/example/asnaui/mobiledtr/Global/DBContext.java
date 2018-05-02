@@ -1,4 +1,4 @@
-package com.example.asnaui.mobiledtr;
+package com.example.asnaui.mobiledtr.Global;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.asnaui.mobiledtr.Object.DtrDate;
-import com.example.asnaui.mobiledtr.Object.DtrTime;
+import com.example.asnaui.mobiledtr.DailyTimeRecord.DTRDate;
+import com.example.asnaui.mobiledtr.DailyTimeRecord.DTRTime;
 
 import java.util.ArrayList;
 
@@ -57,7 +57,7 @@ public class DBContext extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
-    public void insertDate(DtrDate object) {
+    public void insertDate(DTRDate object) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("date", object.date);
@@ -65,7 +65,7 @@ public class DBContext extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
-    public void insertLogs(DtrTime object) {
+    public void insertLogs(DTRTime object) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("date", object.date);
@@ -76,15 +76,15 @@ public class DBContext extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
-    public ArrayList<DtrDate> getDate() {
-        ArrayList<DtrDate> list = new ArrayList<DtrDate>();
+    public ArrayList<DTRDate> getDate() {
+        ArrayList<DTRDate> list = new ArrayList<DTRDate>();
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.query(TBL_DATE, null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
                 String id = cursor.getString(cursor.getColumnIndex("id"));
                 String date = cursor.getString(cursor.getColumnIndex("date"));
-                DtrDate myObject = new DtrDate(id, date, getTimeLogs(date));
+                DTRDate myObject = new DTRDate(id, date, getTimeLogs(date));
                 list.add(myObject);
                 cursor.moveToNext();
             }
@@ -126,15 +126,15 @@ public class DBContext extends SQLiteOpenHelper {
         return status;
     }
 
-    public ArrayList<DtrTime> getTimeLogs(String date) {
-        ArrayList<DtrTime> list = new ArrayList<DtrTime>();
+    public ArrayList<DTRTime> getTimeLogs(String date) {
+        ArrayList<DTRTime> list = new ArrayList<DTRTime>();
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.query(TBL_LOGS, null, "date=?", new String[]{date}, null, null, null);
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
                 String time = cursor.getString(cursor.getColumnIndex("time"));
                 String status = cursor.getString(cursor.getColumnIndex("status"));
-                DtrTime myObject = new DtrTime(date, time, status);
+                DTRTime myObject = new DTRTime(date, time, status);
                 list.add(myObject);
                 cursor.moveToNext();
             }

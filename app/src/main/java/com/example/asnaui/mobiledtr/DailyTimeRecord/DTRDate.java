@@ -1,4 +1,4 @@
-package com.example.asnaui.mobiledtr.Object;
+package com.example.asnaui.mobiledtr.DailyTimeRecord;
 
 import java.util.ArrayList;
 
@@ -6,11 +6,11 @@ import java.util.ArrayList;
  * Created by Asnaui on 1/23/2018.
  */
 
-public class DtrDate {
+public class DTRDate {
     public String date, id;
-    public ArrayList<DtrTime> list;
+    public ArrayList<DTRTime> list;
 
-    public DtrDate(String id, String date, ArrayList<DtrTime> list) {
+    public DTRDate(String id, String date, ArrayList<DTRTime> list) {
         this.id = id;
         this.date = date;
         this.list = list;

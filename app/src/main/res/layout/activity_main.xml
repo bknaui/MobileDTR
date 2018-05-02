@@ -9,9 +9,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="2"
-        android:gravity="center"
+        android:layout_gravity="bottom|center"
+        android:layout_weight="1"
+        android:gravity="bottom|center"
         android:orientation="vertical">
 
         <ImageView
@@ -37,21 +37,35 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_weight="1"
-        android:gravity="top|center"
+        android:gravity="center"
         android:orientation="vertical">
 
-
-        <TextView
-            android:id="@+id/scan"
+        <EditText
+            android:id="@+id/login_id"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="20dp"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="Tap to start scanning"
-            android:textColor="#000"
-            android:textSize="28dp"
-            android:visibility="gone" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/rectangle_white"
+            android:hint="Username"
+            android:inputType="number"
+            android:padding="10dp" />
 
+        <EditText
+            android:id="@+id/login_pin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rectangle_white"
+            android:hint="Password"
+            android:inputType="numberPassword"
+            android:padding="10dp" />
+
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:text="Login"
+            android:textColor="#fff" />
     </LinearLayout>
 </LinearLayout>

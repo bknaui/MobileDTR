@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/dtr"
+            android:title="Daily Time Record">
+
+        </item>
+        <item
+            android:id="@+id/leave"
+            android:title="Leave">
+
+        </item>
+        <item
+            android:id="@+id/so"
+            android:title="Office Order">
+
+        </item>
+        <item
+            android:id="@+id/cto"
+            android:title="Compensatory Time Off">
+        </item>
+    </group>
+</menu>

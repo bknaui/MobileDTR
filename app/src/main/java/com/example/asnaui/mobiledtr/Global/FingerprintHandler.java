@@ -1,17 +1,14 @@
-package com.example.asnaui.mobiledtr;
+package com.example.asnaui.mobiledtr.Global;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.CancellationSignal;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
+
+import com.example.asnaui.mobiledtr.DailyTimeRecord.DTR;
 
 /**
  * Created by Asnaui on 1/23/2018.
@@ -22,10 +19,11 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     private Context appContext;
     private FingerprintManager mManager;
     private FingerprintManager.CryptoObject mCryptoObject;
+    DTR dtr;
 
-
-    public FingerprintHandler(Context context) {
+    public FingerprintHandler(Context context, DTR dtr) {
         appContext = context;
+        this.dtr = dtr;
     }
 
     public void startAuth(FingerprintManager manager,
@@ -46,52 +44,50 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     @Override
     public void onAuthenticationError(int errMsgId,
                                       CharSequence errString) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
-        builder.setMessage(errString.toString());
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-               // startAuth(mManager, mCryptoObject);
-                scannerDialog("Please put your registered finger on the sensor");
-            }
-        });
-      Dialog dialog = builder.create();
-      dialog.show();
+        scannerDialog(errString.toString());
+//        AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
+//        builder.setMessage(errString.toString());
+//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//                scannerDialog("Please put your registered finger on the sensor");
+//            }
+//        });
+//        Dialog dialog = builder.create();
+//        dialog.show();
     }
 
     public void scannerDialog(String message) {
-        Toast.makeText(appContext,message,Toast.LENGTH_LONG).show();
+        Toast.makeText(appContext, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onAuthenticationHelp(int helpMsgId,
                                      CharSequence helpString) {
-        scannerDialog(""+helpString);
+        scannerDialog("" + helpString);
     }
 
     @Override
     public void onAuthenticationFailed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
-        builder.setMessage("Access denied");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-              //  startAuth(mManager, mCryptoObject);
-                scannerDialog("Please put your registered finger on the sensor");
-            }
-        });
-        Dialog dialog = builder.create();
-        dialog.show();
+        scannerDialog("Access denied");
+
+//        AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
+//        builder.setMessage("Access denied");
+//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//                scannerDialog("Access denied");
+//            }
+//        });
+//        Dialog dialog = builder.create();
+//        dialog.show();
     }
 
     @Override
     public void onAuthenticationSucceeded(
             FingerprintManager.AuthenticationResult result) {
+        dtr.presenter.addTimeLogs();
+        dtr.displayList();
 
-        Toast.makeText(appContext,
-                "Authentication succeeded.",
-                Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(appContext, Home.class);
-        appContext.startActivity(intent);
     }
 }
