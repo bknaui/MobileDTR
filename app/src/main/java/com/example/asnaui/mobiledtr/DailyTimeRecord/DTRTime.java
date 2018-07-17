@@ -5,11 +5,12 @@ package com.example.asnaui.mobiledtr.DailyTimeRecord;
  */
 
 public class DTRTime {
-    public String date,time, status;
+    public String date,time, status,filePath;
 
-    public DTRTime(String date, String time, String status) {
+    public DTRTime(String date, String time, String status,String filePath) {
         this.date = date;
         this.time = time;
         this.status = status;
+        this.filePath = filePath;
     }
 }

@@ -1,25 +1,15 @@
 package com.example.asnaui.mobiledtr.Global;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.hardware.fingerprint.FingerprintManager;
-import android.os.CancellationSignal;
-import android.support.v4.app.ActivityCompat;
-import android.widget.Toast;
-
-import com.example.asnaui.mobiledtr.DailyTimeRecord.DTR;
-
 /**
  * Created by Asnaui on 1/23/2018.
  */
-
+/*
 public class FingerprintHandler extends FingerprintManager.AuthenticationCallback {
     private CancellationSignal cancellationSignal;
     private Context appContext;
-    private FingerprintManager mManager;
-    private FingerprintManager.CryptoObject mCryptoObject;
     DTR dtr;
+    Dialog f_dialog, e_dialog;
+    public TextView mMessage;
 
     public FingerprintHandler(Context context, DTR dtr) {
         appContext = context;
@@ -29,6 +19,7 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     public void startAuth(FingerprintManager manager,
                           FingerprintManager.CryptoObject cryptoObject) {
 
+
         cancellationSignal = new CancellationSignal();
 
         if (ActivityCompat.checkSelfPermission(appContext,
@@ -37,57 +28,84 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
             return;
         }
         manager.authenticate(cryptoObject, cancellationSignal, 0, this, null);
-        mManager = manager;
-        mCryptoObject = cryptoObject;
+        dialog_scan();
+        dialog_error();
     }
 
     @Override
     public void onAuthenticationError(int errMsgId,
                                       CharSequence errString) {
-        scannerDialog(errString.toString());
-//        AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
-//        builder.setMessage(errString.toString());
-//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                scannerDialog("Please put your registered finger on the sensor");
-//            }
-//        });
-//        Dialog dialog = builder.create();
-//        dialog.show();
-    }
+        Delay(errString.toString());
+        cancellationSignal.cancel();
 
-    public void scannerDialog(String message) {
-        Toast.makeText(appContext, message, Toast.LENGTH_LONG).show();
     }
-
     @Override
     public void onAuthenticationHelp(int helpMsgId,
                                      CharSequence helpString) {
-        scannerDialog("" + helpString);
+        Delay("" + helpString);
+        cancellationSignal.cancel();
+
     }
 
     @Override
     public void onAuthenticationFailed() {
-        scannerDialog("Access denied");
-
-//        AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
-//        builder.setMessage("Access denied");
-//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                scannerDialog("Access denied");
-//            }
-//        });
-//        Dialog dialog = builder.create();
-//        dialog.show();
+        cancellationSignal.cancel();
+        Delay("Access denied");
     }
 
     @Override
     public void onAuthenticationSucceeded(
             FingerprintManager.AuthenticationResult result) {
-        dtr.presenter.addTimeLogs();
-        dtr.displayList();
+        Delay("Yosha");
+    }
 
+    public void dialog_scan() {
+        if (f_dialog == null) {
+            f_dialog = new Dialog(appContext);
+            f_dialog.setContentView(R.layout.fingerprint_dialog);
+            f_dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(f_dialog.getWindow().getAttributes());
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            lp.gravity = Gravity.CENTER;
+            f_dialog.getWindow().setAttributes(lp);
+        }
+    }
+
+    public void dialog_error() {
+        if (e_dialog == null) {
+            e_dialog = new Dialog(appContext);
+            e_dialog.setContentView(R.layout.fingerprint_error_dialog);
+                e_dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            mMessage = e_dialog.findViewById(R.id.error);
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(e_dialog.getWindow().getAttributes());
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            lp.gravity = Gravity.CENTER;
+            e_dialog.getWindow().setAttributes(lp);
+        }
+    }
+
+    public void Delay(final String message) {
+        f_dialog.show();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                f_dialog.dismiss();
+                if (message.equalsIgnoreCase("Yosha")) {
+                    dtr.presenter.addTimeLogs("","","");
+                    dtr.displayList();
+                } else {
+                    if (!message.equalsIgnoreCase("Fingerprint operation canceled.")) {
+                        mMessage.setText(message);
+                        e_dialog.show();
+                    }
+                }
+            }
+        }, 3000);
     }
 }
+*/

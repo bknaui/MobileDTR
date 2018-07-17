@@ -8,8 +8,9 @@ public class DTRImp {
 
     public interface DTRView{
         void displayList();
+        void displayTimelogDialog(String status,String time);
     }
     public interface DTRPresenter{
-        void addTimeLogs();
+        void addTimeLogs(String date,String time,String filePath);
     }
 }

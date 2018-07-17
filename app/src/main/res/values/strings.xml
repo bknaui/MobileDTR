@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">MobileDTR</string>
     <string name="api_key">AIzaSyArAmWdl7pT2AqEhEoiryvjWErxiPcJ2aw</string>
+    <string-array name="leave_type">
+        <item>Vacation Leave</item>
+        <item>Sick Leave</item>
+        <item>Paternity Leave</item>
+        <item>Maternity Leave</item>
+        <item>Special Leave</item>
+        <item>Forced Leave</item>
+    </string-array>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.asnaui.mobiledtr.Leave;
+package com.example.asnaui.mobiledtr.CompensatoryTimeOff;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,16 +20,15 @@ import com.example.asnaui.mobiledtr.R;
 import java.util.ArrayList;
 
 /**
- * Created by apangcatan on 02/05/2018.
+ * Created by apangcatan on 03/05/2018.
  */
 
-public class Leave extends Fragment implements LeaveImp.LeaveView {
-
+public class CompensatoryTimeOff extends Fragment implements CompensatoryTimeOffImp.View {
     ListView listView;
-    public LeavePresenter presenter;
-    LeaveAdapter adapter;
+    public CompensatoryTimeOffPresenter presenter;
+    CompensatoryTimeOffAdapter adapter;
+    public static ArrayList<String> list = new ArrayList<>();
     AdapterView.AdapterContextMenuInfo info;
-    public static ArrayList<LeaveItem> list = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,10 +47,10 @@ public class Leave extends Fragment implements LeaveImp.LeaveView {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.common_list, null, false);
-        presenter = new LeavePresenter(this, Home.dbContext);
+        presenter = new CompensatoryTimeOffPresenter(this, Home.dbContext);
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
-        displayLeave();
+        display();
         registerForContextMenu(listView);
         return view;
     }
@@ -60,22 +59,23 @@ public class Leave extends Fragment implements LeaveImp.LeaveView {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        menu.setHeaderTitle(list.get(info.position).leave_type);
+        menu.setHeaderTitle(list.get(info.position));
         menu.add(Menu.NONE, 0, 0, "Delete");
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        Home.dbContext.deleteLeave(list.get(info.position).leave_type,list.get(info.position).inclusive_date);
-        displayLeave();
+        Home.dbContext.deleteCTO(list.get(info.position));
+        display();
         Toast.makeText(getContext(),"Successfully Deleted", Toast.LENGTH_SHORT).show();
         return true;
     }
 
+
     @Override
-    public void displayLeave() {
-        list = Home.dbContext.getLeave();
-        adapter = new LeaveAdapter(getContext(), list);
+    public void display() {
+        list = Home.dbContext.getCTO();
+        adapter = new CompensatoryTimeOffAdapter(getContext(), list);
         listView.setAdapter(adapter);
     }
 }

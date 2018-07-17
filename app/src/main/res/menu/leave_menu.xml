@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/fingerprint"
-        android:icon="@drawable/fingerprint_menu"
+        android:id="@+id/leave"
+        android:icon="@android:drawable/ic_menu_add"
         android:title="Fingerprint"
         app:showAsAction="ifRoom"></item>
     <item
@@ -11,5 +11,4 @@
         android:icon="@drawable/upload"
         android:title="Upload"
         app:showAsAction="ifRoom"></item>
-
 </menu>

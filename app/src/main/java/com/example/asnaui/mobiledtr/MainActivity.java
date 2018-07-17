@@ -3,245 +3,160 @@ package com.example.asnaui.mobiledtr;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DownloadManager;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.asnaui.mobiledtr.Global.Constant;
 import com.example.asnaui.mobiledtr.Global.DBContext;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
+import com.example.asnaui.mobiledtr.Global.JsonAPi;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
 
-
-
     public static Dialog dialog;
-    public static Location current = null;
-    private FusedLocationProviderClient mFusedLocationClient;
-    LocationRequest mLocationRequest;
-    private LocationCallback mLocationCallback;
     public DBContext dbContext;
-    public float distanceTo = 0;
-    public static TextView scan;
+    boolean isEnabled = false;
+    public static ProgressDialog pd;
+    int count = 0;
+    String IMEI = "";
+    TextView imei;
+    TelephonyManager telephonyManager;
 
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+      //this.deleteDatabase("db_dtr");
+
         dbContext = new DBContext(this);
+        pd = new ProgressDialog(this);
+        imei = findViewById(R.id.login_pin);
+        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        pd = new ProgressDialog(this);
         findViewById(R.id.login_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(),Home.class);
-                startActivity(intent);
-                finish();
+                if (isEnabled) {
+                    JsonAPi.getInstance(MainActivity.this).Login(Constant.base_url + "/dtr/mobile/login", IMEI);
+                } else {
+                    showDialogDenied("All Permission must be enabled", 2);
+                }
+
             }
         });
-
-       // showLogin();
-//        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//        createLocationRequest();
-//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-//                .addLocationRequest(mLocationRequest);
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+        requestAllPermision();
 
 
-            } else {
+    }
 
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                        0);
-            }
+
+    public void requestAllPermision() {
+        if ((ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) ||
+
+                (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+
+                (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)) {
+
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    0);
         } else {
-//            mLocationCallback = new LocationCallback() {
-//                @Override
-//                public void onLocationResult(LocationResult locationResult) {
-//                    if (locationResult == null) {
-//                        return;
-//                    }
-//                    for (Location location : locationResult.getLocations()) {
-//                        current = location;
-//                        if (current == null) {
-//                            scan.setVisibility(View.GONE);
-//                        } else {
-//                            Log.e("CURRENT", current.getLatitude() + " " + current.getLongitude());
-//                            if (isWithinRadius(current) < 1000) {
-//                                scan.setVisibility(View.VISIBLE);
-//                            } else {
-//                                scan.setVisibility(View.GONE);
-//                            }
-//                        }
-//                    }
-//                }
-//            };
-
-//            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-//                    mLocationCallback,
-//                    null);
-
-        }
-//        SettingsClient client = LocationServices.getSettingsClient(this);
-//        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-//        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
-//            @Override
-//            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-//
-//            }
-//        });
-//
-//        task.addOnFailureListener(this, new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                if (e instanceof ResolvableApiException) {
-//                    try {
-//                        ResolvableApiException resolvable = (ResolvableApiException) e;
-//                        resolvable.startResolutionForResult(MainActivity.this,
-//                                0);
-//                    } catch (IntentSender.SendIntentException sendEx) {
-//
-//                    }
-//                }
-//            }
-//        });
-
-        findViewById(R.id.login_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(),Home.class);
+            isEnabled = true;
+            IMEI = telephonyManager.getDeviceId();
+            imei.setText(IMEI);
+            if (dbContext.getUser() != null) {
+                Intent intent = new Intent(this, Home.class);
                 startActivity(intent);
                 finish();
             }
-        });
-//        scan.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (showLogin()) {
-//                    Location center = new Location("CENTER");
-//                    center.setLatitude(10.1);
-//                    center.setLongitude(10.1);
-//                    if (current != null) {
-//                        if (isWithinRadius(current) < 10000) {
-//                            scannerDialog("Please put your registered finger on the sensor");
-//                        } else {
-//                            scannerDialog("You are not within range of the specified location");
-//                        }
-//                    }
-//                }
-//            }
-//        });
+        }
     }
-
-//    public boolean showLogin() {
-//        if (dbContext.getID().equalsIgnoreCase("")) {
-//            final Dialog dialog = new Dialog(this);
-//            dialog.setContentView(R.layout.register_id_dialog);
-//            final EditText id = dialog.findViewById(R.id.id);
-//            dialog.findViewById(R.id.register).setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    String mId = id.getText().toString();
-//                    if (mId.trim().isEmpty()) {
-//                        id.setError("Required");
-//                        id.requestFocus();
-//                    } else {
-//                        dbContext.insertUser(mId);
-//                        Toast.makeText(MainActivity.this, "Successfully registered", Toast.LENGTH_SHORT).show();
-//                        dialog.dismiss();
-//                    }
-//                }
-//            });
-//            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-//            lp.copyFrom(dialog.getWindow().getAttributes());
-//            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-//            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-//            lp.gravity = Gravity.CENTER;
-//            dialog.getWindow().setAttributes(lp);
-//
-//            dialog.show();
-//            return false;
-//        }
-//        return true;
-//
-//    }
-
-
-
-    public void scannerDialog(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
-
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        isEnabled = false;
         switch (requestCode) {
             case 0: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                        grantResults[1] == PackageManager.PERMISSION_GRANTED &&
+                        grantResults[2] == PackageManager.PERMISSION_GRANTED
+                        ) {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
-//                    mLocationCallback = new LocationCallback() {
-//                        @Override
-//                        public void onLocationResult(LocationResult locationResult) {
-//                            if (locationResult == null) {
-//                                return;
-//                            }
-//                            for (Location location : locationResult.getLocations()) {
-//                                current = location;
-//                                if (current == null) {
-//                                    scan.setVisibility(View.GONE);
-//                                } else {
-//                                    Log.e("CURRENT", current.getLatitude() + " " + current.getLongitude());
-//                                    if (isWithinRadius(current) < 10000) {
-//                                        scan.setVisibility(View.VISIBLE);
-//                                    } else {
-//                                        scan.setVisibility(View.GONE);
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    };
-//
-//                    mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-//                            mLocationCallback,
-//                            null);
-                } else {
-                    showDialogDenied("Location permission must be enabled to check if you are within the specified area");
+                    IMEI = telephonyManager.getDeviceId();
+                    isEnabled = true;
+                    imei.setText(IMEI);
+                    if (dbContext.getUser() != null) {
+                        Intent intent = new Intent(this, Home.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                    return;
                 }
+
+                requestAllPermision();
                 return;
             }
         }
     }
 
-    public void showDialogDenied(String message) {
+    public void showDialogDenied(String message, final int code) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setMessage(message);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        0);
+                if (code == 0) {
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            1);
+                } else if (code == 1) {
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            2);
+                } else {
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            0);
+                }
+
             }
         });
         builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
@@ -255,11 +170,102 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    public float isWithinRadius(Location test) {
-        Location center = new Location("CENTER");
-        center.setLatitude(10.3076739);
-        center.setLongitude(123.8931655);
-        distanceTo = center.distanceTo(test);
-        return distanceTo;
+    public int VERSION_CODE() {
+        int version_code = -1;
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            version_code = pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return version_code;
+    }
+
+    public void compareVersion() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://192.168.100.14/pis/CheckVersion", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                if (!response.equalsIgnoreCase(VERSION_CODE() + "")) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("Notice!");
+                    builder.setMessage("WFP Tracking App v" + response + " is now available, please update your app." +
+                            "\n\nNote: Updating will close the application to apply changes.");
+                    builder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            pd = ProgressDialog.show(MainActivity.this, "Downloading", "Please wait...", false, false);
+                            downloadAndInstallApk();
+                        }
+                    });
+                    builder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    builder.show();
+                } else {
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error instanceof TimeoutError) {
+                    Toast.makeText(MainActivity.this, "Connection Timeout", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "No network connection : Offline Mode", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                320000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
+        mRequestQueue.add(stringRequest);
+    }
+
+    public void downloadAndInstallApk() {
+        try {
+            final String destination = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/mobile_dtr.apk";
+            final Uri uri = Uri.parse("file://" + destination);
+
+            File file = new File(destination);
+            if (file.exists()) file.delete();
+
+            String url = "http://192.168.100.14/pis/public/apk/app-debug.apk";
+
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            request.setDescription("Download new version of the App");
+            request.setTitle("WFP Tracking");
+
+            request.setDestinationUri(uri);
+
+            final DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+            manager.enqueue(request);
+
+            BroadcastReceiver onComplete = new BroadcastReceiver() {
+                public void onReceive(Context ctxt, Intent intent) {
+                    if (intent.getAction().equals(DownloadManager.ACTION_DOWNLOAD_COMPLETE)) {
+                        pd.dismiss();
+
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setDataAndType(Uri.fromFile(new File(destination)),
+                                "application/vnd.android.package-archive");
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                    }
+                }
+            };
+
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+
+            registerReceiver(onComplete, filter);
+        } catch (Exception e) {
+            Log.e("Exception", e.getMessage());
+            pd.dismiss();
+        }
     }
 }
