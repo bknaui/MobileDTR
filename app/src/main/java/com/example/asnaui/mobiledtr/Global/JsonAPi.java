@@ -108,35 +108,36 @@ public class JsonAPi {
                 params.put("time", DTR.list.get(date_position).list.get(time_position).time);
                 params.put("event", DTR.list.get(date_position).list.get(time_position).status);
                 params.put("date", DTR.list.get(date_position).list.get(time_position).date);
+                params.put("filename",DTR.list.get(date_position).list.get(time_position).filePath.split("/")[6]);
                 try {
 
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inSampleSize = 2;
-                    Bitmap bitmap;
-
-                    bitmap = BitmapFactory.decodeStream(new FileInputStream(DTR.list.get(date_position).list.get(time_position).filePath),
+                    Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(DTR.list.get(date_position).list.get(time_position).filePath),
                             null, options);
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
                     bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream); //compress to which format you want.
                     byte[] byte_arr = stream.toByteArray();
                     String image_str = Base64.encodeToString(byte_arr, Base64.DEFAULT);
-
-
-                    // params.put("image", image_str);
+                    params.put("image", image_str);
 
                     Log.e("INSERTED",
                             "Date: " + DTR.list.get(date_position).list.get(time_position).date +
                                     "\nTime: " + DTR.list.get(date_position).list.get(time_position).time +
+                                    "\nFilepath: "+DTR.list.get(date_position).list.get(time_position).filePath.split("/")[6]+
+                                    "\nEncoded: "+image_str+
                                     "\nEvent: " + DTR.list.get(date_position).list.get(time_position).status);
 
                 } catch (FileNotFoundException e) {
+                    Log.e("FileNotFound", e.getMessage());
                     params.put("image", "");
                 }
                 return params;
             }
         };
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                10000,
+                20000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         mRequestQueue.add(stringRequest);
@@ -325,7 +326,7 @@ public class JsonAPi {
                 } else {
                     Toast.makeText(mCtx, "Something went wrong, please contact administrator", Toast.LENGTH_SHORT).show();
                 }
-                Log.e("LoginError", error.getMessage()+" A");
+                Log.e("LoginError", error.getMessage() + " A");
                 MainActivity.pd.dismiss();
             }
         }) {

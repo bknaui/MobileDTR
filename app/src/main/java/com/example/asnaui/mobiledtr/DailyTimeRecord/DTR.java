@@ -1,8 +1,10 @@
 package com.example.asnaui.mobiledtr.DailyTimeRecord;
 
 import android.app.Dialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,6 +54,9 @@ public class DTR extends Fragment implements DTRImp.DTRView {
         View view = inflater.inflate(R.layout.dtr_list, null, false);
         listView = view.findViewById(R.id.dtr_list);
         listView.setDividerHeight(0);
+        adapter = new DtrListAdapter(list, getContext());
+        listView.invalidate();
+        listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -64,10 +69,9 @@ public class DTR extends Fragment implements DTRImp.DTRView {
 
     @Override
     public void displayList() {
-        list = Home.dbContext.getDate();
-        adapter = new DtrListAdapter(list, getContext());
-        listView.invalidate();
-        listView.setAdapter(adapter);
+        Home.pd.setMessage("Loading data, please wait....");
+        Home.pd.show();
+        new MyLoader().execute();
     }
 
 
@@ -91,5 +95,31 @@ public class DTR extends Fragment implements DTRImp.DTRView {
         dialog.show();
     }
 
+
+    public class MyLoader extends AsyncTask<Void, Integer, ArrayList<DTRDate>> {
+
+        @Override
+        protected ArrayList<DTRDate> doInBackground(Void... voids) {
+            ArrayList<DTRDate> list = Home.dbContext.getDate();
+            return list;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            Home.pd.setProgress(values[0]);
+        }
+
+
+        @Override
+        protected void onPostExecute(ArrayList<DTRDate> dtrDates) {
+            super.onPostExecute(dtrDates);
+            list.clear();
+            list.addAll(dtrDates);
+            adapter.notifyDataSetChanged();
+            Log.e("Count", dtrDates.size() + " AS");
+            Home.pd.dismiss();
+        }
+    }
 
 }

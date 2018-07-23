@@ -1,8 +1,10 @@
 package com.example.asnaui.mobiledtr.CompensatoryTimeOff;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,6 +52,8 @@ public class CompensatoryTimeOff extends Fragment implements CompensatoryTimeOff
         presenter = new CompensatoryTimeOffPresenter(this, Home.dbContext);
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
+        adapter = new CompensatoryTimeOffAdapter(getContext(), list);
+        listView.setAdapter(adapter);
         display();
         registerForContextMenu(listView);
         return view;
@@ -67,15 +71,41 @@ public class CompensatoryTimeOff extends Fragment implements CompensatoryTimeOff
     public boolean onContextItemSelected(MenuItem item) {
         Home.dbContext.deleteCTO(list.get(info.position));
         display();
-        Toast.makeText(getContext(),"Successfully Deleted", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
         return true;
     }
 
 
     @Override
     public void display() {
-        list = Home.dbContext.getCTO();
-        adapter = new CompensatoryTimeOffAdapter(getContext(), list);
-        listView.setAdapter(adapter);
+        Home.pd.setMessage("Loading data, please wait....");
+        Home.pd.show();
+        new MyLoader().execute();
+    }
+
+    public class MyLoader extends AsyncTask<Void, Integer, ArrayList<String>> {
+
+        @Override
+        protected ArrayList<String> doInBackground(Void... voids) {
+            ArrayList<String> list = Home.dbContext.getCTO();
+            return list;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            Home.pd.setProgress(values[0]);
+        }
+
+
+        @Override
+        protected void onPostExecute(ArrayList<String> dtrDates) {
+            super.onPostExecute(dtrDates);
+            list.clear();
+            list.addAll(dtrDates);
+            adapter.notifyDataSetChanged();
+            Log.e("Count", dtrDates.size() + " AS");
+            Home.pd.dismiss();
+        }
     }
 }

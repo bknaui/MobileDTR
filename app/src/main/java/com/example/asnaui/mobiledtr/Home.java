@@ -88,9 +88,6 @@ public class Home extends AppCompatActivity {
     Dialog dialog;
     public static User user;
     public static TextView mLocation;
-    public boolean checker = false;
-    int count = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,16 +214,6 @@ public class Home extends AppCompatActivity {
 
     public View setNavigationHeader() {
         View view = LayoutInflater.from(this).inflate(R.layout.navigation_header, null, false);
-        view.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                count++;
-                if (count == 3) {
-                    checker = true;
-                }
-                return true;
-            }
-        });
         TextView name = view.findViewById(R.id.name);
         name.setText(user.name);
         return view;
@@ -562,12 +549,11 @@ public class Home extends AppCompatActivity {
                 }
                 return true;
             case R.id.fingerprint:
-                if (GET_CURRENT_MAC() != null || checker) {
-                   // if (true) {
-                        if (GET_CURRENT_MAC().equalsIgnoreCase("ec:e1:a9:87:5a:70") || checker) {
+                if (GET_CURRENT_MAC() != null) {
+                        if (GET_CURRENT_MAC().equalsIgnoreCase("ec:e1:a9:87:5a:70")) {
                         if (Constant.isTimeAutomatic(this)) {
-                            if (current != null || checker) {
-                                if (Constant.isWithinRadius(current) < 100 || checker) {
+                            if (current != null) {
+                                if (Constant.isWithinRadius(current) < 100) {
                                     Intent imageIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                                     String timeStamp = new SimpleDateFormat("yyyy_MM_dd#HH_mm_ss").format(new Date());
                                     File imagesFolder = new File(Environment.getExternalStorageDirectory(), ".MobileDTR/MyImages");

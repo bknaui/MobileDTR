@@ -53,10 +53,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-      //this.deleteDatabase("db_dtr");
+        //this.deleteDatabase("db_dtr");
 
         dbContext = new DBContext(this);
         pd = new ProgressDialog(this);

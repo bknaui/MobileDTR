@@ -1,8 +1,10 @@
 package com.example.asnaui.mobiledtr.OfficeOrder;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,6 +52,8 @@ public class OfficeOrder extends Fragment implements OfficeOrderImp.View {
         presenter = new OfficeOrderPresenter(this, Home.dbContext);
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
+        adapter = new OfficeOrderAdapter(getContext(), list);
+        listView.setAdapter(adapter);
         display();
         registerForContextMenu(listView);
         return view;
@@ -74,8 +78,34 @@ public class OfficeOrder extends Fragment implements OfficeOrderImp.View {
 
     @Override
     public void display() {
-        list = Home.dbContext.getSO();
-        adapter = new OfficeOrderAdapter(getContext(), list);
-        listView.setAdapter(adapter);
+        Home.pd.setMessage("Loading data, please wait....");
+        Home.pd.show();
+      new MyLoader().execute();
+    }
+    public class MyLoader extends AsyncTask<Void, Integer, ArrayList<OfficeOrderItem>> {
+
+        @Override
+        protected ArrayList<OfficeOrderItem> doInBackground(Void... voids) {
+
+            ArrayList<OfficeOrderItem> list = Home.dbContext.getSO();
+            return list;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            Home.pd.setProgress(values[0]);
+        }
+
+
+        @Override
+        protected void onPostExecute(ArrayList<OfficeOrderItem> dtrDates) {
+            super.onPostExecute(dtrDates);
+            list.clear();
+            list.addAll(dtrDates);
+            adapter.notifyDataSetChanged();
+            Log.e("Count", dtrDates.size() + " AS");
+            Home.pd.dismiss();
+        }
     }
 }

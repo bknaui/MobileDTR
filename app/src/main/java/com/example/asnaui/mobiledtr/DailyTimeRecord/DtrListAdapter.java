@@ -34,7 +34,7 @@ public class DtrListAdapter extends BaseAdapter {
         this.dateList = dateList;
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
-        Log.e("MOBSTAZ","DTRADAPTER");
+        Log.e("MOBSTAZ", "DTRADAPTER");
     }
 
     @Override
@@ -63,13 +63,10 @@ public class DtrListAdapter extends BaseAdapter {
             view.setTag(handler);
         } else {
             handler = (Handler) view.getTag();
-            if(dateList.get(i).list.size() < handler.container.getChildCount()){
-                handler.container.removeAllViews();
-            }
         }
+        handler.container.removeAllViews();
         handler.date.setText(dateList.get(i).date);
-        for (int z = 0; z < dateList.get(i).list.size(); z++)
-        {
+        for (int z = 0; z < dateList.get(i).list.size(); z++) {
             handler.container.addView(TimeLogs(dateList.get(i).list.get(z).time, dateList.get(i).list.get(z).status, dateList.get(i).list.get(z).filePath));
         }
         return view;

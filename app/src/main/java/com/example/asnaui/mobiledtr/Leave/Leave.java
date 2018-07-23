@@ -1,8 +1,10 @@
 package com.example.asnaui.mobiledtr.Leave;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,6 +53,8 @@ public class Leave extends Fragment implements LeaveImp.LeaveView {
         presenter = new LeavePresenter(this, Home.dbContext);
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
+        adapter = new LeaveAdapter(getContext(), list);
+        listView.setAdapter(adapter);
         displayLeave();
         registerForContextMenu(listView);
         return view;
@@ -66,16 +70,44 @@ public class Leave extends Fragment implements LeaveImp.LeaveView {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        Home.dbContext.deleteLeave(list.get(info.position).leave_type,list.get(info.position).inclusive_date);
+        Home.dbContext.deleteLeave(list.get(info.position).leave_type, list.get(info.position).inclusive_date);
         displayLeave();
-        Toast.makeText(getContext(),"Successfully Deleted", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
         return true;
     }
 
     @Override
     public void displayLeave() {
-        list = Home.dbContext.getLeave();
-        adapter = new LeaveAdapter(getContext(), list);
-        listView.setAdapter(adapter);
+        Home.pd.setMessage("Loading data, please wait....");
+        Home.pd.show();
+        new MyLoader().execute();
+
+    }
+
+    public class MyLoader extends AsyncTask<Void, Integer, ArrayList<LeaveItem>> {
+
+        @Override
+        protected ArrayList<LeaveItem> doInBackground(Void... voids) {
+
+            ArrayList<LeaveItem> list = Home.dbContext.getLeave();
+            return list;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            Home.pd.setProgress(values[0]);
+        }
+
+
+        @Override
+        protected void onPostExecute(ArrayList<LeaveItem> dtrDates) {
+            super.onPostExecute(dtrDates);
+            list.clear();
+            list.addAll(dtrDates);
+            adapter.notifyDataSetChanged();
+            Log.e("Count", dtrDates.size() + " AS");
+            Home.pd.dismiss();
+        }
     }
 }
