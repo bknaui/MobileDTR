@@ -70,6 +70,7 @@ public class JsonAPi {
             public void onResponse(String response) {
                 if (response.equalsIgnoreCase("1")) {
                     if ((time_position + 1) < DTR.list.get(date_position).list.size()) {
+                       // dbContext.deleteLogs(DTR.list.get(date_position).list.get(time_position).date, DTR.list.get(date_position).list.get(time_position).time);
                         InsertLogs(url, date_position, (time_position + 1));
                     } else {
                         if ((date_position + 1) < DTR.list.size()) {
@@ -99,6 +100,7 @@ public class JsonAPi {
                 }
                 Home.pd.dismiss();
                 Log.e("InsertLogs", error.getMessage() + " ");
+                Home.dtr.displayList();
             }
         }) {
             @Override
@@ -108,7 +110,7 @@ public class JsonAPi {
                 params.put("time", DTR.list.get(date_position).list.get(time_position).time);
                 params.put("event", DTR.list.get(date_position).list.get(time_position).status);
                 params.put("date", DTR.list.get(date_position).list.get(time_position).date);
-                params.put("filename",DTR.list.get(date_position).list.get(time_position).filePath.split("/")[6]);
+                params.put("filename", DTR.list.get(date_position).list.get(time_position).filePath.split("/")[6]);
                 try {
 
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -125,8 +127,8 @@ public class JsonAPi {
                     Log.e("INSERTED",
                             "Date: " + DTR.list.get(date_position).list.get(time_position).date +
                                     "\nTime: " + DTR.list.get(date_position).list.get(time_position).time +
-                                    "\nFilepath: "+DTR.list.get(date_position).list.get(time_position).filePath.split("/")[6]+
-                                    "\nEncoded: "+image_str+
+                                    "\nFilepath: " + DTR.list.get(date_position).list.get(time_position).filePath.split("/")[6] +
+                                    "\nEncoded: " + image_str +
                                     "\nEvent: " + DTR.list.get(date_position).list.get(time_position).status);
 
                 } catch (FileNotFoundException e) {

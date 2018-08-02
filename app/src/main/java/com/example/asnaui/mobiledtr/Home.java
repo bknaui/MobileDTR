@@ -21,6 +21,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -46,6 +47,7 @@ import com.example.asnaui.mobiledtr.Leave.Leave;
 import com.example.asnaui.mobiledtr.Leave.LeaveItem;
 import com.example.asnaui.mobiledtr.OfficeOrder.OfficeOrder;
 import com.example.asnaui.mobiledtr.OfficeOrder.OfficeOrderItem;
+import com.example.asnaui.mobiledtr.Tutorial.Tutorial;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -84,6 +86,7 @@ public class Home extends AppCompatActivity {
     public static DTR dtr = new DTR();
     public static Leave leave = new Leave();
     public static OfficeOrder oo = new OfficeOrder();
+    public static Tutorial tutorial = new Tutorial();
     public static CompensatoryTimeOff cto = new CompensatoryTimeOff();
     Dialog dialog;
     public static User user;
@@ -135,6 +138,11 @@ public class Home extends AppCompatActivity {
                                 ft = fm.beginTransaction();
                                 ft.replace(R.id.content_frame, leave).commit();
                                 break;
+                            case R.id.tutorial:
+                                toolbar.setTitle("Tutorial");
+                                ft = fm.beginTransaction();
+                                ft.replace(R.id.content_frame, tutorial).commit();
+                                break;
                         }
                         menuItem.setChecked(true);
                         drawerLayout.closeDrawers();
@@ -157,20 +165,6 @@ public class Home extends AppCompatActivity {
                 }
                 for (Location location : locationResult.getLocations()) {
                     Home.current = location;
-                    if (Home.current == null) {
-                        // mLocation.setText("Location Callibrating... ... ");
-                        /// mLocation.setVisibility(View.VISIBLE);
-                    } else {
-                        if (Constant.isWithinRadius(current) < 150) {
-                            //  mLocation.setVisibility(View.GONE);
-                        } else {
-                            //   mLocation.setText("Not Within Range");
-                            //   mLocation.setVisibility(View.VISIBLE);
-                        }
-                        //  mLocation.setText(Home.current.getLatitude() + " " + Home.current.getLongitude() + " - " + Constant.isWithinRadius(current));
-
-                        Log.e("CURRENT", Constant.isWithinRadius(current) + " OKAY");
-                    }
                 }
             }
         };
@@ -199,8 +193,7 @@ public class Home extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case 0: {
                 if (grantResults.length > 0
@@ -550,17 +543,18 @@ public class Home extends AppCompatActivity {
                 return true;
             case R.id.fingerprint:
                 if (GET_CURRENT_MAC() != null) {
-                        if (GET_CURRENT_MAC().equalsIgnoreCase("ec:e1:a9:87:5a:70")) {
+                    if (GET_CURRENT_MAC().equalsIgnoreCase("ec:e1:a9:87:5a:70")) {
                         if (Constant.isTimeAutomatic(this)) {
                             if (current != null) {
-                                if (Constant.isWithinRadius(current) < 100) {
+                                if (Constant.isWithinRadius(current) < 200) {
                                     Intent imageIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                                     String timeStamp = new SimpleDateFormat("yyyy_MM_dd#HH_mm_ss").format(new Date());
                                     File imagesFolder = new File(Environment.getExternalStorageDirectory(), ".MobileDTR/MyImages");
                                     imagesFolder.mkdirs();
                                     File image = new File(imagesFolder, user.id + "_" + timeStamp + ".png");
                                     filePath = image.getAbsolutePath();
-                                    Uri uriSavedImage = Uri.fromFile(image);
+                                    // Uri uriSavedImage = Uri.fromFile(image);
+                                    Uri uriSavedImage = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".my.package.name.provider", new File(imagesFolder, user.id + "_" + timeStamp + ".png"));
                                     imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage);
 
                                     date = timeStamp.split("#")[0].split("_")[0] + "-" + timeStamp.split("#")[0].split("_")[1] + "-" + timeStamp.split("#")[0].split("_")[2];

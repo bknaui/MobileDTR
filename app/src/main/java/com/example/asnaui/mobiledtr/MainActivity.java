@@ -55,9 +55,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        //this.deleteDatabase("db_dtr");
+        /*
+        setContentView(R.layout.calendar_view);
+        MaterialCalendarView calendarView = findViewById(R.id.calendar_view);
+        List<CalendarDay> list = new ArrayList<>();
+        list.add(CalendarDay.from(2018, 7, 13));
+        list.add(CalendarDay.from(2018, 7, 14));
+        list.add(CalendarDay.from(2018, 7, 15));
+        calendarView.addDecorator(new EventDecorator(this, list));
+        */
+
+
+        setContentView(R.layout.activity_main);
 
         dbContext = new DBContext(this);
         pd = new ProgressDialog(this);
@@ -76,10 +86,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         requestAllPermision();
-
-
     }
-
 
     public void requestAllPermision() {
         if ((ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&

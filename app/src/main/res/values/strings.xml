@@ -9,4 +9,39 @@
         <item>Special Leave</item>
         <item>Forced Leave</item>
     </string-array>
+    <string name="how_dtr">
+        Step 1: Enable GPS Location and Automatic Time Zone\n
+        Step 2: Connect to CHD7_WiFi\n
+        Step 3: Tap the Fingerprint Icon\n
+        Step 4: Take a selfie and press OK\
+        nStep 5: You successfully time in/out\n
+        Step 6: Tap upload icon to sync it to the server\n\n\n
+        NOTE: It is advisable to upload only when you have IN and OUT because only the device remembers the IN/OUT status
+    </string>
+
+    <string name="how_leave">
+             Step 1: Tap the Add/Plus Icon\n
+            Step 2: Select which type of leave you want\n
+            Step 3: Specify the inclusive dates\n
+            Step 4: Tap save\n
+            Step 5: Tap upload icon to sync it to the server\n\n\n
+            NOTE: Inclusive dates must have the same month e.g 07/25/2018 - 07/31/2018
+    </string>
+
+    <string name="how_so">
+             Step 1: Tap the Add/Plus Icon\n
+            Step 2: Input SO #\n
+            Step 3: Specify the inclusive dates\n
+            Step 4: Tap save\n
+            Step 5: Tap upload icon to sync it to the server\n\n\n
+            NOTE: Inclusive dates must have the same month e.g 07/25/2018 - 07/31/2018
+    </string>
+
+    <string name="how_cto">
+             Step 1: Tap the Add/Plus Icon\n
+            Step 2: Specify the inclusive dates\n
+            Step 3: Tap save\n
+            Step 4: Tap upload icon to sync it to the server\n\n\n
+            NOTE: Inclusive dates must have the same month e.g 07/25/2018 - 07/31/2018
+    </string>
 </resources>

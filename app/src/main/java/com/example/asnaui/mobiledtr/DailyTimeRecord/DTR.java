@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.asnaui.mobiledtr.Home;
 import com.example.asnaui.mobiledtr.R;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.util.ArrayList;
 
@@ -34,6 +35,8 @@ public class DTR extends Fragment implements DTRImp.DTRView {
     public DTRPresenter presenter;
     Dialog dialog;
     TextView mStatus, mTime;
+    //
+    MaterialCalendarView calendarView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,39 @@ public class DTR extends Fragment implements DTRImp.DTRView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dtr_list, null, false);
+//        calendarView = view.findViewById(R.id.calendar_view);
+//        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+//            @Override
+//            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
+//                Dialog timelog_dialog = new Dialog(getContext());
+//                timelog_dialog.setContentView(R.layout.dialog_show_timelog);
+//                TextView date = timelog_dialog.findViewById(R.id.timelog_date);
+//                TextView day = timelog_dialog.findViewById(R.id.timelog_day);
+//                LinearLayout timelog_container = timelog_dialog.findViewById(R.id.timelog_container);
+//                String monthString = new DateFormatSymbols().getMonths()[calendarDay.getMonth()];
+//                date.setText(monthString + " " + calendarDay.getYear());
+//                day.setText(calendarDay.getDay() + " ");
+//
+//                SQLiteDatabase sqLiteDatabase = Home.dbContext.getReadableDatabase();
+//                ArrayList<DTRTime> timelogs = Home.dbContext.getTimeLogs(calendarDay.getYear() + "-" + String.format("%02d", calendarDay.getMonth() + 1) + "-" + String.format("%02d", calendarDay.getDay()), sqLiteDatabase);
+//                sqLiteDatabase.close();
+//
+//                Log.e("TIMELOG_SIZE", timelogs.size() + " ASD");
+//                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+//                lp.copyFrom(timelog_dialog.getWindow().getAttributes());
+//                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+//                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+//                lp.gravity = Gravity.CENTER;
+//                timelog_dialog.getWindow().setAttributes(lp);
+//                for (int i = 0; i < timelogs.size(); i++) {
+//                    timelog_container.addView(getTimelogView(timelogs.get(i)));
+//                }
+//                timelog_dialog.show();
+//
+//            }
+//        });
+//        displayList();
+
         listView = view.findViewById(R.id.dtr_list);
         listView.setDividerHeight(0);
         adapter = new DtrListAdapter(list, getContext());
@@ -63,7 +99,8 @@ public class DTR extends Fragment implements DTRImp.DTRView {
                 displayList();
             }
         });
-        displayList();
+
+
         return view;
     }
 
@@ -96,6 +133,17 @@ public class DTR extends Fragment implements DTRImp.DTRView {
     }
 
 
+    public View getTimelogView(DTRTime timelog) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.logs_item_template, null, false);
+        TextView time = view.findViewById(R.id.time);
+        TextView status = view.findViewById(R.id.status);
+
+        time.setText(timelog.time);
+        status.setText(timelog.status);
+        return view;
+    }
+
+
     public class MyLoader extends AsyncTask<Void, Integer, ArrayList<DTRDate>> {
 
         @Override
@@ -116,8 +164,20 @@ public class DTR extends Fragment implements DTRImp.DTRView {
             super.onPostExecute(dtrDates);
             list.clear();
             list.addAll(dtrDates);
+//            List<CalendarDay> calendarDayList = new ArrayList<>();
+//            for (int i = 0; i < list.size(); i++) {
+//                int year = Integer.parseInt(list.get(i).date.split("-")[0]);
+//                int month = Integer.parseInt(list.get(i).date.split("-")[1]);
+//                int day = Integer.parseInt(list.get(i).date.split("-")[2]);
+//                calendarDayList.add(CalendarDay.from(year, (month - 1), day));
+//            }
+//            calendarView.removeDecorators();
+//            calendarView.addDecorator(new EventDecorator(getContext(), calendarDayList));
+
+
             adapter.notifyDataSetChanged();
             Log.e("Count", dtrDates.size() + " AS");
+
             Home.pd.dismiss();
         }
     }

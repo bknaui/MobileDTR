@@ -35,4 +35,9 @@
             </group>
         </menu>
     </item>
+
+    <item
+        android:id="@+id/tutorial"
+        android:title="Tutorial" />
+
 </menu>

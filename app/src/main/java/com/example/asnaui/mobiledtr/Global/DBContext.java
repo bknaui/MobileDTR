@@ -284,6 +284,13 @@ public class DBContext extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
+    public void deleteLogs(String date,String time) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+       // sqLiteDatabase.delete(TBL_DATE, null, null);
+        sqLiteDatabase.delete(TBL_LOGS, "date=? AND time=?", new String[]{date,time});
+        sqLiteDatabase.close();
+    }
+
     public void deleteLeave(String type, String date) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         if (!date.equalsIgnoreCase("")) {
