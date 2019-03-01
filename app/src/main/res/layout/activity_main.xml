@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D2D6DE"
+    android:background="@color/colorPrimary"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -16,8 +16,9 @@
 
         <ImageView
             android:id="@+id/loader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:backgroundTint="#fff"
             android:src="@drawable/logo" />
 
         <TextView
@@ -25,8 +26,8 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="10dp"
-            android:text="DOHRO7 DTR"
-            android:textColor="#000"
+            android:text="Mobile DTR"
+            android:textColor="#fff"
             android:textSize="32dp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -64,7 +65,7 @@
             android:id="@+id/login_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorPrimaryDark"
             android:text="Login"
             android:textColor="#fff" />
     </LinearLayout>

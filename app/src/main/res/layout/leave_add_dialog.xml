@@ -3,22 +3,41 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="15dp">
+    android:padding="10dp">
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="13dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:text="APPLY FOR LEAVE"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="#000"
+        android:textStyle="bold" />
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:background="#fff"
         android:orientation="horizontal">
 
         <Spinner
+
             android:id="@+id/leave_type"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:background="@drawable/rectangle_black"
             android:entries="@array/leave_type"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:paddingLeft="13dp"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -35,14 +54,21 @@
             android:background="@drawable/rectangle_black"
             android:hint="From"
             android:padding="10dp"
-            android:textSize="14dp" />
+            android:paddingLeft="13dp"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
+            android:textAppearance="?android:textAppearanceSmall" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/rectangle_white"
             android:hint="-"
             android:padding="10dp"
+            android:paddingLeft="13dp"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
             android:textSize="14dp" />
 
         <TextView
@@ -53,13 +79,15 @@
             android:background="@drawable/rectangle_black"
             android:hint="To"
             android:padding="10dp"
-            android:textSize="14dp" />
+            android:textAppearance="?android:textAppearanceSmall" />
     </LinearLayout>
 
     <Button
         android:id="@+id/save_leave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="SAVE" />
+        android:layout_marginTop="20dp"
+        android:background="@color/colorAccent"
+        android:text="SAVE"
+        android:textColor="#fff" />
 </LinearLayout>

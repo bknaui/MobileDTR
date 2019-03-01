@@ -20,7 +20,7 @@
                 android:id="@+id/date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#1B5E20"
+                android:background="@color/dtr_date_header"
                 android:padding="10dp"
                 android:text="January 29, 2018"
                 android:textColor="#fff"

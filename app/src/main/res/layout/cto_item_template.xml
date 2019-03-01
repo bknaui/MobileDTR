@@ -8,7 +8,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingLeft="5dp"
+        android:paddingTop="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="20dp">
 
 
         <LinearLayout
@@ -22,6 +26,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textStyle="bold"
+                android:textAppearance="?android:textAppearanceSmall"
                 android:text="Inclusive Date" />
 
             <TextView
@@ -30,9 +36,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_weight="2"
+                android:textAppearance="?android:textAppearanceSmall"
                 android:text="02/02/2018 - 02/03/2018"
-                android:textColor="#000"
-                android:textStyle="bold" />
+                android:textColor="#000" />
 
         </LinearLayout>
     </LinearLayout>
