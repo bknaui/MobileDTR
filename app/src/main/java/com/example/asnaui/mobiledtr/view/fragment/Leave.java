@@ -4,24 +4,25 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.asnaui.mobiledtr.adapter.LeaveAdapter;
+import com.example.asnaui.mobiledtr.R;
+import com.example.asnaui.mobiledtr.adapter.LeaveListAdapter;
 import com.example.asnaui.mobiledtr.contract.LeaveContract;
+import com.example.asnaui.mobiledtr.contract.SwipeCallBack;
 import com.example.asnaui.mobiledtr.model.LeaveModel;
 import com.example.asnaui.mobiledtr.presenter.LeavePresenter;
+import com.example.asnaui.mobiledtr.util.LeaveSwipCallback;
 import com.example.asnaui.mobiledtr.view.activity.Home;
-import com.example.asnaui.mobiledtr.R;
 
 import java.util.ArrayList;
 
@@ -31,10 +32,10 @@ import java.util.ArrayList;
 
 public class Leave extends Fragment implements LeaveContract.LeaveView {
 
-    ListView listView;
+    private RecyclerView listView;
     public LeavePresenter presenter;
-    LeaveAdapter adapter;
-    AdapterView.AdapterContextMenuInfo info;
+    private LeaveListAdapter adapter;
+    private LeaveSwipCallback leaveSwipCallback;
     public static ArrayList<LeaveModel> list = new ArrayList<>();
 
     @Override
@@ -54,30 +55,32 @@ public class Leave extends Fragment implements LeaveContract.LeaveView {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.common_list, null, false);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
         presenter = new LeavePresenter(this, Home.dbContext);
         listView = view.findViewById(R.id.list);
-        listView.setDividerHeight(0);
-        adapter = new LeaveAdapter(getContext(), list);
+        listView.setLayoutManager(linearLayoutManager);
+
+        adapter = new LeaveListAdapter(list, new SwipeCallBack.Leave() {
+            @Override
+            public void onItemDelete(LeaveModel leave) {
+                Home.dbContext.deleteLeave(leave.leave_type, leave.inclusive_date);
+                Toast.makeText(getContext(), "Leave:"+leave.leave_type+" deleted", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        leaveSwipCallback = new LeaveSwipCallback(getContext(), adapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(leaveSwipCallback);
+        itemTouchHelper.attachToRecyclerView(listView);
+
         listView.setAdapter(adapter);
+
         displayLeave();
         registerForContextMenu(listView);
         return view;
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        menu.setHeaderTitle(list.get(info.position).leave_type);
-        menu.add(Menu.NONE, 0, 0, "Delete");
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        Home.dbContext.deleteLeave(list.get(info.position).leave_type, list.get(info.position).inclusive_date);
-        displayLeave();
-        Toast.makeText(getContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
-        return true;
     }
 
     @Override

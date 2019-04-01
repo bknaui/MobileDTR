@@ -4,23 +4,24 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.asnaui.mobiledtr.adapter.CompensatoryTimeOffAdapter;
-import com.example.asnaui.mobiledtr.contract.CompensatoryTimeOffContract;
-import com.example.asnaui.mobiledtr.presenter.CompensatoryTimeOffPresenter;
-import com.example.asnaui.mobiledtr.view.activity.Home;
 import com.example.asnaui.mobiledtr.R;
+import com.example.asnaui.mobiledtr.adapter.CtoListAdapter;
+import com.example.asnaui.mobiledtr.contract.CompensatoryTimeOffContract;
+import com.example.asnaui.mobiledtr.contract.SwipeCallBack;
+import com.example.asnaui.mobiledtr.presenter.CompensatoryTimeOffPresenter;
+import com.example.asnaui.mobiledtr.util.CtoSwipCallback;
+import com.example.asnaui.mobiledtr.view.activity.Home;
 
 import java.util.ArrayList;
 
@@ -29,11 +30,12 @@ import java.util.ArrayList;
  */
 
 public class CompensatoryTimeOff extends Fragment implements CompensatoryTimeOffContract.View {
-    ListView listView;
+    private RecyclerView listView;
     public CompensatoryTimeOffPresenter presenter;
-    CompensatoryTimeOffAdapter adapter;
+    private CtoListAdapter adapter;
+    private CtoSwipCallback ctoSwipCallback;
     public static ArrayList<String> list = new ArrayList<>();
-    AdapterView.AdapterContextMenuInfo info;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,30 +54,30 @@ public class CompensatoryTimeOff extends Fragment implements CompensatoryTimeOff
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.common_list, null, false);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
         presenter = new CompensatoryTimeOffPresenter(this, Home.dbContext);
         listView = view.findViewById(R.id.list);
-        listView.setDividerHeight(0);
-        adapter = new CompensatoryTimeOffAdapter(getContext(), list);
+        listView.setLayoutManager(linearLayoutManager);
+
+        adapter = new CtoListAdapter(list, new SwipeCallBack.Cto() {
+            @Override
+            public void onItemDelete(String value) {
+                Home.dbContext.deleteCTO(value);
+                Toast.makeText(getContext(), "CTO Date:" + value + " deleted", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        ctoSwipCallback = new CtoSwipCallback(getContext(), adapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(ctoSwipCallback);
+        itemTouchHelper.attachToRecyclerView(listView);
+
         listView.setAdapter(adapter);
         display();
-        registerForContextMenu(listView);
         return view;
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        menu.setHeaderTitle(list.get(info.position));
-        menu.add(Menu.NONE, 0, 0, "Delete");
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        Home.dbContext.deleteCTO(list.get(info.position));
-        display();
-        Toast.makeText(getContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
-        return true;
     }
 
 

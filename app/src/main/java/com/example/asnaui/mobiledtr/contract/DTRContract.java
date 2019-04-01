@@ -9,6 +9,8 @@ public class DTRContract {
     public interface DTRView{
         void displayList();
         void displayTimelogDialog(String status,String time);
+        void displayErrorDialog();
+        void updateLocationStatus(String location, int backgroundColor);
     }
     public interface DTRPresenter{
         void addTimeLogs(String date,String time,String filePath,String latitude,String longitude);

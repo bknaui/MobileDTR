@@ -19,9 +19,9 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 
         if (!LocationManagerHelper.isLocationEnabled(context)) {
             Home.setCurrentLocation(null);
-            Home.updateLocationStatus("GPS not enabled",ContextCompat.getColor(context,R.color.gps_disabled));
+            Home.updateLocationStatus("Location/GPS not enabled",ContextCompat.getColor(context,R.color.gps_disabled));
         } else {
-            Home.updateLocationStatus("Location Callibrating...", ContextCompat.getColor(context,R.color.callibrating));
+            Home.updateLocationStatus("Location/GPS Callibrating...", ContextCompat.getColor(context,R.color.callibrating));
         }
     }
 }

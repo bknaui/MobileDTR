@@ -7,22 +7,12 @@
 
     <TextView
         android:id="@+id/time"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"
         android:text="08:23:12"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textColor="#000" />
-
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="IN "
-        android:textColor="#000" />
-
 </LinearLayout>

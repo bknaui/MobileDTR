@@ -3,6 +3,7 @@ package com.example.asnaui.mobiledtr.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 
 /**
@@ -23,6 +24,15 @@ public class DTRDateModel implements Parcelable {
         date = in.readString();
         id = in.readString();
         list = in.createTypedArrayList(DTRTimeModel.CREATOR);
+    }
+
+    public String formatDate(){
+        String[] date = this.date.split("-");
+        int year = Integer.parseInt(date[0]);
+        int month = Integer.parseInt(date[1]);
+        int day = Integer.parseInt(date[2]);
+        String month_name = new DateFormatSymbols().getMonths()[month-1];
+        return month_name+" "+day+", "+year;
     }
 
     public static final Creator<DTRDateModel> CREATOR = new Creator<DTRDateModel>() {

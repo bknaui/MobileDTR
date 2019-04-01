@@ -51,31 +51,37 @@ public class DtrListAdapter extends BaseAdapter {
         if (view == null) {
             handler = new Handler();
             view = layoutInflater.inflate(R.layout.dtr_item_template, null, true);
-            handler.container = view.findViewById(R.id.time_logs);
+            handler.container_in = view.findViewById(R.id.time_logs_in);
+            handler.container_out = view.findViewById(R.id.time_logs_out);
             handler.date = view.findViewById(R.id.date);
             view.setTag(handler);
         } else {
             handler = (Handler) view.getTag();
         }
-        handler.container.removeAllViews();
-        handler.date.setText(dateList.get(i).date);
+
+        handler.container_in.removeAllViews();
+        handler.container_out.removeAllViews();
+
+        handler.date.setText(dateList.get(i).formatDate());
         for (int z = 0; z < dateList.get(i).list.size(); z++) {
-            handler.container.addView(TimeLogs(dateList.get(i).list.get(z).time, dateList.get(i).list.get(z).status, dateList.get(i).list.get(z).filePath));
+            if(dateList.get(i).list.get(z).status.equalsIgnoreCase("IN")){
+                handler.container_in.addView(TimeLogs(dateList.get(i).list.get(z).formatToAmPm()));
+            }else{
+                handler.container_out.addView(TimeLogs(dateList.get(i).list.get(z).formatToAmPm()));
+            }
         }
         return view;
     }
 
-    public View TimeLogs(String time, String status, String filePath) {
+    public View TimeLogs(String time) {
         View view = layoutInflater.inflate(R.layout.logs_item_template, null, false);
         TextView mTime = view.findViewById(R.id.time);
-        TextView mStatus = view.findViewById(R.id.status);
         mTime.setText(time);
-        mStatus.setText(status);
         return view;
     }
 
     class Handler {
-        LinearLayout container;
+        LinearLayout container_in,container_out;
         TextView date;
     }
 

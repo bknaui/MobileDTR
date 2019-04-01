@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -18,6 +19,7 @@ import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -57,12 +59,19 @@ import com.example.asnaui.mobiledtr.view.fragment.DTR;
 import com.example.asnaui.mobiledtr.view.fragment.Leave;
 import com.example.asnaui.mobiledtr.view.fragment.OfficeOrder;
 import com.example.asnaui.mobiledtr.view.fragment.Tutorial;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -80,11 +89,11 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
  * Created by Asnaui on 1/23/2018.
  */
 
-public class Home extends AppCompatActivity {
+public class Home extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback {
 
 
     private String date, time, filePath;
-
+    protected GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private LocationCallback callback;
     private FusedLocationProviderClient locationClient;
@@ -106,9 +115,13 @@ public class Home extends AppCompatActivity {
     public static CompensatoryTimeOff cto = new CompensatoryTimeOff();
     Dialog dialog;
     public static UserModel userModel;
-    public static TextView mLocation;
     ListView menu;
     BroadcastReceiver myBroadcastReceiver;
+
+    LocationSettingsRequest locationSettingsRequest;
+    SettingsClient settingsClient;
+    LocationSettingsRequest.Builder builder;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +129,6 @@ public class Home extends AppCompatActivity {
         setContentView(R.layout.home);
 
         toolbar = findViewById(R.id.toolbar);
-        mLocation = findViewById(R.id.location);
         navigationView = findViewById(R.id.nav_view);
 
         toolbar.setTitle("Daily Time Record");
@@ -128,8 +140,10 @@ public class Home extends AppCompatActivity {
 
         fm = getSupportFragmentManager();
         ft = fm.beginTransaction();
+        ft.setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right, R.animator.enter_from_right, R.animator.exit_to_left);
         ft.add(R.id.content_frame, dtr).commit();
         userModel = dbContext.getUser();
+
 
         //TABLET SETTINGS
         if (navigationView != null) {
@@ -142,31 +156,24 @@ public class Home extends AppCompatActivity {
                     new NavigationView.OnNavigationItemSelectedListener() {
                         @Override
                         public boolean onNavigationItemSelected(MenuItem menuItem) {
+                            ft = fm.beginTransaction();
+                            ft.setCustomAnimations(R.animator.enter_from_left, R.animator.exit_to_right, R.animator.enter_from_right, R.animator.exit_to_left);
                             switch (menuItem.getItemId()) {
                                 case R.id.dtr:
                                     toolbar.setTitle("Daily Time Record");
-                                    ft = fm.beginTransaction();
                                     ft.replace(R.id.content_frame, dtr).commit();
                                     break;
                                 case R.id.cto:
                                     toolbar.setTitle("Compensatory Time Off");
-                                    ft = fm.beginTransaction();
                                     ft.replace(R.id.content_frame, cto).commit();
                                     break;
                                 case R.id.so:
                                     toolbar.setTitle("Office Order");
-                                    ft = fm.beginTransaction();
                                     ft.replace(R.id.content_frame, oo).commit();
                                     break;
                                 case R.id.leave:
                                     toolbar.setTitle("Leave");
-                                    ft = fm.beginTransaction();
                                     ft.replace(R.id.content_frame, leave).commit();
-                                    break;
-                                case R.id.tutorial:
-                                    toolbar.setTitle("Tutorial");
-                                    ft = fm.beginTransaction();
-                                    ft.replace(R.id.content_frame, tutorial).commit();
                                     break;
                             }
                             menuItem.setChecked(true);
@@ -192,21 +199,25 @@ public class Home extends AppCompatActivity {
                         case 0:
                             toolbar.setTitle("Daily Time Record");
                             ft = fm.beginTransaction();
+                            ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
                             ft.replace(R.id.content_frame, dtr).commit();
                             break;
                         case 1:
                             toolbar.setTitle("Leave");
                             ft = fm.beginTransaction();
+                            ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
                             ft.replace(R.id.content_frame, leave).commit();
                             break;
                         case 2:
                             toolbar.setTitle("Office Order");
                             ft = fm.beginTransaction();
+                            ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
                             ft.replace(R.id.content_frame, oo).commit();
                             break;
                         case 3:
                             toolbar.setTitle("Compensatory Time Off");
                             ft = fm.beginTransaction();
+                            ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
                             ft.replace(R.id.content_frame, cto).commit();
                             break;
                     }
@@ -216,14 +227,20 @@ public class Home extends AppCompatActivity {
         }
 
         init_broadcast();
+
     }
+
+    public static void updateLocationStatus(String location, int backgroundColor) {
+        dtr.updateLocationStatus(location, backgroundColor);
+    }
+
 
     protected void init_broadcast() {
 
         if (!LocationManagerHelper.isLocationEnabled(this)) {
-            updateLocationStatus("GPS not enabled", ContextCompat.getColor(this, R.color.gps_disabled));
+            updateLocationStatus("Location/GPS not enabled", ContextCompat.getColor(this, R.color.gps_disabled));
         } else {
-            updateLocationStatus("Location Callibrating..", ContextCompat.getColor(this, R.color.callibrating));
+            updateLocationStatus("Location/GPS Callibrating..", ContextCompat.getColor(this, R.color.callibrating));
         }
 
         myBroadcastReceiver = new MyBroadcastReceiver();
@@ -237,16 +254,23 @@ public class Home extends AppCompatActivity {
 
     protected void startLocationUpdates() {
 
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this).build();
+        mGoogleApiClient.connect();
+
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(5000);
         mLocationRequest.setFastestInterval(3000);
 
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
-        LocationSettingsRequest locationSettingsRequest = builder.build();
 
-        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+        locationSettingsRequest = builder.build();
+
+        settingsClient = LocationServices.getSettingsClient(this);
         settingsClient.checkLocationSettings(locationSettingsRequest);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -264,7 +288,7 @@ public class Home extends AppCompatActivity {
 
     public void onLocationChanged(Location location) {
         setCurrentLocation(location);
-        updateLocationStatus("Location acquired", ContextCompat.getColor(this, R.color.location_acquired));
+        updateLocationStatus("Location/GPS acquired", ContextCompat.getColor(this, R.color.location_acquired));
     }
 
     public void getLastLocation() {
@@ -283,7 +307,7 @@ public class Home extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                Log.d("MapDemoActivity", "Error trying to get last Location/GPS");
                 e.printStackTrace();
             }
         });
@@ -648,7 +672,8 @@ public class Home extends AppCompatActivity {
                         if (current != null) {
                             initiateImageCapture();
                         } else {
-                            Toast.makeText(this, "Cannot acquire Location or please enable Location GPS", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Cannot acquire Location or please enable Location/GPS", Toast.LENGTH_SHORT).show();
+                            settingsClient = LocationServices.getSettingsClient(this);
                         }
                     }
                 } else {
@@ -682,6 +707,14 @@ public class Home extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, intentFromCamera);
         Log.e("Check", requestCode + " " + resultCode);
         switch (requestCode) {
+            case 100:
+                if (resultCode == RESULT_OK) {
+                    updateLocationStatus("Location/GPS Callibrating..", ContextCompat.getColor(this, R.color.callibrating));
+                } else {
+
+                    updateLocationStatus("Location/GPS not enabled", ContextCompat.getColor(this, R.color.gps_disabled));
+                }
+                break;
             case 1:
                 if (resultCode != RESULT_CANCELED) {
                     if (current != null) {
@@ -689,31 +722,26 @@ public class Home extends AppCompatActivity {
                         String longitude = String.valueOf(current.getLongitude());
                         dtr.getPresenter().addTimeLogs(date, time, filePath, latitude, longitude);
                     } else {
-                        Toast.makeText(this, "Do not disable GPS Location, please try again...", Toast.LENGTH_SHORT).show();
+                        dtr.displayErrorDialog();
                     }
                 }
                 break;
             case 0:
-                mLocation.setVisibility(View.VISIBLE);
                 if (resultCode == RESULT_CANCELED) {
                     Log.e("CANCELLED", "Cancel");
                     setCurrentLocation(null);
-                    updateLocationStatus("GPS not enabled", ContextCompat.getColor(this, R.color.gps_disabled));
+                    updateLocationStatus("Location/GPS not enabled", ContextCompat.getColor(this, R.color.gps_disabled));
 
                 } else {
-                    updateLocationStatus("Location Callibrating..", ContextCompat.getColor(this, R.color.callibrating));
+                    updateLocationStatus("Location/GPS Callibrating..", ContextCompat.getColor(this, R.color.callibrating));
                 }
                 break;
         }
     }
 
+
     public static void setCurrentLocation(Location current) {
         Home.current = current;
-    }
-
-    public static void updateLocationStatus(String location, int backgroundColor) {
-        mLocation.setBackgroundColor(backgroundColor);
-        mLocation.setText(location);
     }
 
     @Override
@@ -722,5 +750,60 @@ public class Home extends AppCompatActivity {
         Log.e("CLOSED", "CLOSED");
         unregisterReceiver(myBroadcastReceiver);
         locationClient.removeLocationUpdates(callback);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        builder.setAlwaysShow(true);
+        PendingResult result =
+                LocationServices.SettingsApi.checkLocationSettings(
+                        mGoogleApiClient,
+                        builder.build()
+                );
+
+        result.setResultCallback(this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onResult(@NonNull Result result) {
+        final Status status = result.getStatus();
+        switch (status.getStatusCode()) {
+            case LocationSettingsStatusCodes.SUCCESS:
+
+                // NO need to show the dialog;
+
+                break;
+
+            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                //  Location settings are not satisfied. Show the user a dialog
+
+                try {
+                    // Show the dialog by calling startResolutionForResult(), and check the result
+                    // in onActivityResult().
+
+                    status.startResolutionForResult(this, 100);
+
+                } catch (IntentSender.SendIntentException e) {
+
+                    //failed to show
+                }
+                break;
+
+            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                // Location settings are unavailable so not possible to show any dialog now
+                break;
+        }
     }
 }

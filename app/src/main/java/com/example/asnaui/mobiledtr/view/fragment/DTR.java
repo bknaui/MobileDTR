@@ -20,7 +20,6 @@ import com.example.asnaui.mobiledtr.R;
 import com.example.asnaui.mobiledtr.adapter.DtrListAdapter;
 import com.example.asnaui.mobiledtr.contract.DTRContract;
 import com.example.asnaui.mobiledtr.model.DTRDateModel;
-import com.example.asnaui.mobiledtr.model.DTRTimeModel;
 import com.example.asnaui.mobiledtr.presenter.DTRPresenter;
 import com.example.asnaui.mobiledtr.view.activity.Home;
 
@@ -38,7 +37,7 @@ public class DTR extends Fragment implements DTRContract.DTRView {
     public static ArrayList<DTRDateModel> list = new ArrayList<>();
     private DTRPresenter presenter;
     private Dialog dialog;
-    private TextView mStatus, mTime;
+    private TextView mStatus, mTime, mLocation;
 
 
     public DTRPresenter getPresenter() {
@@ -56,12 +55,13 @@ public class DTR extends Fragment implements DTRContract.DTRView {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.home, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dtr_list, null, false);
+        View view = inflater.inflate(R.layout.dtr_list, container, false);
+        mLocation = view.findViewById(R.id.location_status);
         listView = view.findViewById(R.id.dtr_list);
         listView.setDividerHeight(0);
         adapter = new DtrListAdapter(list, getContext());
@@ -103,17 +103,29 @@ public class DTR extends Fragment implements DTRContract.DTRView {
         dialog.show();
     }
 
+    @Override
+    public void displayErrorDialog() {
+        Dialog dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.fingerprint_error_dialog);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-    public View getTimelogView(DTRTimeModel timelog) {
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.logs_item_template, null, false);
-        TextView time = view.findViewById(R.id.time);
-        TextView status = view.findViewById(R.id.status);
-
-        time.setText(timelog.time);
-        status.setText(timelog.status);
-        return view;
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.gravity = Gravity.CENTER;
+        dialog.getWindow().setAttributes(lp);
+        dialog.show();
     }
 
+    @Override
+    public void updateLocationStatus(String location, int backgroundColor) {
+        if (this.mLocation == null) return;
+
+        this.mLocation.setVisibility(View.VISIBLE);
+        this.mLocation.setBackgroundColor(backgroundColor);
+        this.mLocation.setText(location);
+    }
 
     public class MyLoader extends AsyncTask<Void, Integer, ArrayList<DTRDateModel>> {
 

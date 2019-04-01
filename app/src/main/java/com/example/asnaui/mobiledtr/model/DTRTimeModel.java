@@ -7,8 +7,8 @@ import android.os.Parcelable;
  * Created by Asnaui on 1/23/2018.
  */
 
-public class DTRTimeModel implements Parcelable{
-    public String date,time, status,filePath,latitude,longitude;
+public class DTRTimeModel implements Parcelable {
+    public String date, time, status, filePath, latitude, longitude;
 
     public DTRTimeModel(String date, String time, String status, String filePath, String latitude, String longitude) {
         this.date = date;
@@ -26,6 +26,21 @@ public class DTRTimeModel implements Parcelable{
         filePath = in.readString();
         latitude = in.readString();
         longitude = in.readString();
+    }
+
+    public String formatToAmPm() {
+        String[] time = this.time.split(":");
+        int hour = Integer.parseInt(time[0]);
+        String am_pm = "AM";
+        if (hour > 12) {
+            am_pm = "PM";
+            return (hour - 12) + ":" + time[1] + ":" + time[2] + " " + am_pm;
+        }
+        if (hour == 12) {
+            am_pm = "PM";
+            return hour + ":" + time[1] + ":" + time[2] + " " + am_pm;
+        }
+        return hour + ":" + time[1] + ":" + time[2] + " " + am_pm;
     }
 
     public static final Creator<DTRTimeModel> CREATOR = new Creator<DTRTimeModel>() {

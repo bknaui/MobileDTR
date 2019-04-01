@@ -3,16 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="left"
-    android:background="@drawable/navigation_header_bg"
+    android:background="@drawable/mobile_dtr_backdrop"
     android:gravity="left"
-    android:paddingTop="80dp"
+    android:orientation="vertical"
     android:paddingLeft="20dp"
-    android:paddingBottom="40dp"
-    android:orientation="vertical">
+    android:paddingTop="10dp">
 
     <ImageView
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="100dp"
+        android:adjustViewBounds="true"
+        android:layout_height="100dp"
         android:layout_gravity="left"
         android:src="@drawable/logo" />
 
@@ -22,5 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Asnaui O. Pangcatan"
-        android:textColor="#fff" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#fff"
+        android:textStyle="bold" />
 </LinearLayout>

@@ -4,24 +4,25 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.asnaui.mobiledtr.adapter.OfficeOrderAdapter;
+import com.example.asnaui.mobiledtr.R;
+import com.example.asnaui.mobiledtr.adapter.OfficeOrderListAdapter;
 import com.example.asnaui.mobiledtr.contract.OfficeOrderContract;
+import com.example.asnaui.mobiledtr.contract.SwipeCallBack;
 import com.example.asnaui.mobiledtr.model.OfficeOrderModel;
 import com.example.asnaui.mobiledtr.presenter.OfficeOrderPresenter;
+import com.example.asnaui.mobiledtr.util.OfficeOrderSwipCallback;
 import com.example.asnaui.mobiledtr.view.activity.Home;
-import com.example.asnaui.mobiledtr.R;
 
 import java.util.ArrayList;
 
@@ -30,10 +31,11 @@ import java.util.ArrayList;
  */
 
 public class OfficeOrder extends Fragment implements OfficeOrderContract.View {
-    ListView listView;
+    private RecyclerView listView;
+    private OfficeOrderListAdapter officeOrderListAdapter;
+    private OfficeOrderSwipCallback officeOrderSwipCallback;
+
     public OfficeOrderPresenter presenter;
-    OfficeOrderAdapter adapter;
-    AdapterView.AdapterContextMenuInfo info;
     public static ArrayList<OfficeOrderModel> list = new ArrayList<>();
 
     @Override
@@ -52,40 +54,41 @@ public class OfficeOrder extends Fragment implements OfficeOrderContract.View {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.common_list, null, false);
+        View view = inflater.inflate(R.layout.common_list, container, false);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
         presenter = new OfficeOrderPresenter(this, Home.dbContext);
         listView = view.findViewById(R.id.list);
-        listView.setDividerHeight(0);
-        adapter = new OfficeOrderAdapter(getContext(), list);
-        listView.setAdapter(adapter);
+        listView.setLayoutManager(linearLayoutManager);
+
+        officeOrderListAdapter = new OfficeOrderListAdapter(list, new SwipeCallBack.OfficeOrder() {
+            @Override
+            public void onItemDelete(OfficeOrderModel officeOrder) {
+                Home.dbContext.deleteSO(officeOrder.so, officeOrder.date);
+                Toast.makeText(getContext(), "SO#:"+officeOrder.so+" deleted", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        officeOrderSwipCallback = new OfficeOrderSwipCallback(getContext(), officeOrderListAdapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(officeOrderSwipCallback);
+        itemTouchHelper.attachToRecyclerView(listView);
+
+        listView.setAdapter(officeOrderListAdapter);
+
         display();
-        registerForContextMenu(listView);
         return view;
     }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        menu.setHeaderTitle(list.get(info.position).so);
-        menu.add(Menu.NONE, 0, 0, "Delete");
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        Home.dbContext.deleteSO(list.get(info.position).so,list.get(info.position).date);
-        display();
-        Toast.makeText(getContext(),"Successfully Deleted", Toast.LENGTH_SHORT).show();
-        return true;
-    }
-
 
     @Override
     public void display() {
         Home.pd.setMessage("Loading data, please wait....");
         Home.pd.show();
-      new MyLoader().execute();
+        new MyLoader().execute();
     }
+
     public class MyLoader extends AsyncTask<Void, Integer, ArrayList<OfficeOrderModel>> {
 
         @Override
@@ -107,7 +110,7 @@ public class OfficeOrder extends Fragment implements OfficeOrderContract.View {
             super.onPostExecute(dtrDates);
             list.clear();
             list.addAll(dtrDates);
-            adapter.notifyDataSetChanged();
+            officeOrderListAdapter.notifyDataSetChanged();
             Log.e("Count", dtrDates.size() + " AS");
             Home.pd.dismiss();
         }

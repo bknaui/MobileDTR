@@ -9,4 +9,5 @@
     <color name="location_acquired">#33691E</color>
 
     <color name="dtr_date_header">#006064</color>
+    <color name="dtr_date_status">#007379</color>
 </resources>

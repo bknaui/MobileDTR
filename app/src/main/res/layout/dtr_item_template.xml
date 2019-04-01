@@ -23,14 +23,71 @@
                 android:background="@color/dtr_date_header"
                 android:padding="10dp"
                 android:text="January 29, 2018"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="#fff"
                 android:textStyle="bold" />
 
             <LinearLayout
-                android:id="@+id/time_logs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:padding="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/dtr_date_status"
+                        android:gravity="center"
+                        android:text="IN"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="#fff"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/time_logs_in"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:padding="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/dtr_date_status"
+                        android:gravity="center"
+                        android:text="OUT"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="#fff"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/time_logs_out"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
 
             </LinearLayout>
 

@@ -1,44 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/group_one"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/dtr"
+            android:title="Daily Time Record"></item>
+    </group>
+    <group
+        android:id="@+id/group_two"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/leave"
+            android:title="Leave"></item>
+        <item
+            android:id="@+id/so"
+            android:title="Office Order">
 
-    <item android:title="Time In/Out">
-        <menu>
-            <group
-                android:id="@+id/group_one"
-                android:checkableBehavior="single">
-                <item
-                    android:id="@+id/dtr"
-                    android:title="Daily Time Record">
-
-                </item>
-            </group>
-        </menu>
-    </item>
-
-
-    <item android:title="File Absence">
-        <menu>
-            <group
-                android:id="@+id/group_two"
-                android:checkableBehavior="single">
-                <item
-                    android:id="@+id/leave"
-                    android:title="Leave"></item>
-                <item
-                    android:id="@+id/so"
-                    android:title="Office Order">
-
-                </item>
-                <item
-                    android:id="@+id/cto"
-                    android:title="Compensatory Time Off"></item>
-            </group>
-        </menu>
-    </item>
-
-    <item
-        android:id="@+id/tutorial"
-        android:title="Tutorial"
-        android:visible="false" />
-
+        </item>
+        <item
+            android:id="@+id/cto"
+            android:title="Compensatory Time Off"></item>
+    </group>
 </menu>
