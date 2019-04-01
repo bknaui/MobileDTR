@@ -90,9 +90,9 @@ public class Home extends AppCompatActivity {
     private FusedLocationProviderClient locationClient;
 
     public static Location current = null;
-
     public static ProgressDialog pd;
     static public DBContext dbContext;
+
     static public String id = "";
     private static Toolbar toolbar;
     FragmentTransaction ft;
@@ -218,10 +218,12 @@ public class Home extends AppCompatActivity {
         init_broadcast();
     }
 
-    protected void init_broadcast(){
+    protected void init_broadcast() {
 
-        if(!LocationManagerHelper.isLocationEnabled(this)){
-            updateLocationStatus("GPS not enabled", ContextCompat.getColor(this,R.color.gps_disabled));
+        if (!LocationManagerHelper.isLocationEnabled(this)) {
+            updateLocationStatus("GPS not enabled", ContextCompat.getColor(this, R.color.gps_disabled));
+        } else {
+            updateLocationStatus("Location Callibrating..", ContextCompat.getColor(this, R.color.callibrating));
         }
 
         myBroadcastReceiver = new MyBroadcastReceiver();
@@ -240,15 +242,12 @@ public class Home extends AppCompatActivity {
         mLocationRequest.setInterval(5000);
         mLocationRequest.setFastestInterval(3000);
 
-
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
         LocationSettingsRequest locationSettingsRequest = builder.build();
 
-
         SettingsClient settingsClient = LocationServices.getSettingsClient(this);
         settingsClient.checkLocationSettings(locationSettingsRequest);
-
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -265,7 +264,7 @@ public class Home extends AppCompatActivity {
 
     public void onLocationChanged(Location location) {
         setCurrentLocation(location);
-        updateLocationStatus("Location acquired",ContextCompat.getColor(this,R.color.location_acquired));
+        updateLocationStatus("Location acquired", ContextCompat.getColor(this, R.color.location_acquired));
     }
 
     public void getLastLocation() {
@@ -699,10 +698,10 @@ public class Home extends AppCompatActivity {
                 if (resultCode == RESULT_CANCELED) {
                     Log.e("CANCELLED", "Cancel");
                     setCurrentLocation(null);
-                    updateLocationStatus("GPS not enabled", ContextCompat.getColor(this,R.color.gps_disabled));
+                    updateLocationStatus("GPS not enabled", ContextCompat.getColor(this, R.color.gps_disabled));
 
                 } else {
-                    updateLocationStatus("Location Callibrating..",ContextCompat.getColor(this,R.color.callibrating));
+                    updateLocationStatus("Location Callibrating..", ContextCompat.getColor(this, R.color.callibrating));
                 }
                 break;
         }

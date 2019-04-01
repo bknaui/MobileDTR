@@ -41,7 +41,7 @@ public class DBContext extends SQLiteOpenHelper {
                 "name" + " TEXT, " +
                 "id" + " TEXT NOT NULL);"
         );
-        sqLiteDatabase.execSQL(" CREATE TABLE " + TBL_DATE + " (" +
+        sqLiteDatabase.execSQL(" CREATE TABLE " + TBL_DATE + " (    " +
                 "id" + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                 "date" + " TEXT NOT NULL);"
         );
