@@ -1,5 +1,7 @@
 package com.example.asnaui.mobiledtr.presenter;
 
+import android.util.Log;
+
 import com.example.asnaui.mobiledtr.model.UserModel;
 import com.example.asnaui.mobiledtr.contract.LoginContract;
 
@@ -12,6 +14,7 @@ public class LoginPresenter implements LoginContract.LoginPresenter {
 
     @Override
     public void login(String url, String imei) {
+        Log.e("Login", url + " " + imei);
         loginView.getApiInstance().Login(url, imei, new LoginContract.LoginCallback() {
             @Override
             public void onSuccess(UserModel userModel) {

@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 
 import com.example.asnaui.mobiledtr.R;
-import com.example.asnaui.mobiledtr.view.activity.Home;
+import com.example.asnaui.mobiledtr.contract.DTRContract;
 
 /**
  * Created by apangcatan on 26/04/2018.
@@ -14,14 +14,21 @@ import com.example.asnaui.mobiledtr.view.activity.Home;
 
 public class MyBroadcastReceiver extends BroadcastReceiver {
 
+    DTRContract.LocationCallback callback;
+
+    public MyBroadcastReceiver(DTRContract.LocationCallback callback) {
+        this.callback = callback;
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
         if (!LocationManagerHelper.isLocationEnabled(context)) {
-            Home.setCurrentLocation(null);
-            Home.updateLocationStatus("Location/GPS not enabled",ContextCompat.getColor(context,R.color.gps_disabled));
+            callback.setLocation(null);
+            callback.updateStatus("Location/GPS not enabled", ContextCompat.getColor(context, R.color.gps_disabled));
+
         } else {
-            Home.updateLocationStatus("Location/GPS Callibrating...", ContextCompat.getColor(context,R.color.callibrating));
+            callback.updateStatus("Location/GPS Callibrating...", ContextCompat.getColor(context,R.color.callibrating));
         }
     }
 }

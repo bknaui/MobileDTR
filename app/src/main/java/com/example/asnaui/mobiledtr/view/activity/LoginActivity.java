@@ -8,10 +8,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -50,6 +52,8 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Lo
             @Override
             public void onClick(View view) {
                 if (isEnabled) {
+                   // IMEI = "353237075301581";
+                    Log.e("IMEI", IMEI);
                     pd.show();
                     loginPresenter.login(Constant.base_url + "/dtr/mobile/login", IMEI);
 
@@ -68,11 +72,14 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Lo
 
 
                 (ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                 ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                        ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
 
-                ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED  ||
+                (ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) ||
 
-                ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED ) {
+                ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+
+                ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(LoginActivity.this,
                     new String[]{
@@ -84,8 +91,12 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Lo
                     0);
         } else {
             isEnabled = true;
-            IMEI = telephonyManager.getDeviceId();
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                IMEI = Build.getSerial();
+            } else {
+                IMEI = telephonyManager.getDeviceId();
+            }
             if (dbContext.getUser() != null) {
                 Intent intent = new Intent(this, Home.class);
                 startActivity(intent);
@@ -156,7 +167,6 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Lo
         dialog = builder.create();
         dialog.show();
     }
-
 
 
     @Override

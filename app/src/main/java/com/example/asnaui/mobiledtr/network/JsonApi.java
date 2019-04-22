@@ -63,22 +63,23 @@ public class JsonApi {
         return mRequestQueue;
     }
 
-    public void InsertLogs(final String url, final int date_position, final int time_position) {
+    public void InsertLogs (final String url, final int date_position, final int time_position) {
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.e("onResponse", response);
                 if (response.equalsIgnoreCase("1")) {
+                    dbContext.deleteTimeLog(DTR.list.get(date_position).list.get(time_position).date, DTR.list.get(date_position).list.get(time_position).time);
                     if ((time_position + 1) < DTR.list.get(date_position).list.size()) {
-                        dbContext.deleteLogs(DTR.list.get(date_position).list.get(time_position).date, DTR.list.get(date_position).list.get(time_position).time);
+                        Log.e("InsertLogs","Success");
                         InsertLogs(url, date_position, (time_position + 1));
                     } else {
+                        dbContext.deleteDateLog(DTR.list.get(date_position).date);
                         if ((date_position + 1) < DTR.list.size()) {
                             InsertLogs(url, (date_position + 1), 0);
                         } else {
                             Home.pd.dismiss();
-                            dbContext.deleteLogs();
                             Home.dtr.displayList();
                             Toast.makeText(mCtx, "Successfully uploaded", Toast.LENGTH_SHORT).show();
                             Constant.deletePictures();
@@ -92,17 +93,16 @@ public class JsonApi {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("HELLO", error.getMessage()+" ");
+                Log.e("HELLO", error.getMessage() + " ");
 
-                if(error == null || error.networkResponse == null){
-                    Toast.makeText(mCtx, "Something went wrong, please contact administrator", Toast.LENGTH_SHORT).show();
-                }
-                else if (error instanceof NoConnectionError) {
+                if (error instanceof NoConnectionError) {
                     Toast.makeText(mCtx, "No network connection", Toast.LENGTH_SHORT).show();
                 } else if (error instanceof TimeoutError) {
                     Toast.makeText(mCtx, "Connection time out", Toast.LENGTH_SHORT).show();
+                } else if (error == null || error.networkResponse == null) {
+                    Toast.makeText(mCtx, "Something went wrong, please contact administrator", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(mCtx, error.getMessage()+" ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mCtx, error.getMessage() + " ", Toast.LENGTH_SHORT).show();
                 }
                 Home.pd.dismiss();
                 Log.e("InsertLogs", error.getMessage() + " ");
@@ -136,8 +136,8 @@ public class JsonApi {
                             "Date: " + DTR.list.get(date_position).list.get(time_position).date +
                                     "\nTime: " + DTR.list.get(date_position).list.get(time_position).time +
                                     "\nFilepath: " + DTR.list.get(date_position).list.get(time_position).filePath.split("/")[6] +
-                                    "\nLocation: " + DTR.list.get(date_position).list.get(time_position).latitude +" "+DTR.list.get(date_position).list.get(time_position).longitude+
-                                    "\nEvent: " + DTR.list.get(date_position).list.get(time_position).status+
+                                    "\nLocation: " + DTR.list.get(date_position).list.get(time_position).latitude + " " + DTR.list.get(date_position).list.get(time_position).longitude +
+                                    "\nEvent: " + DTR.list.get(date_position).list.get(time_position).status +
                                     "\nEncoded: " + image_str);
 
                 } catch (FileNotFoundException e) {
@@ -313,12 +313,12 @@ public class JsonApi {
                         String userid = jsonObject.getString("userid");
                         String name = jsonObject.getString("fname") + " " + jsonObject.getString("lname");
 
-                        UserModel userModel = new UserModel(userid,name);
+                        UserModel userModel = new UserModel(userid, name);
                         loginCallback.onSuccess(userModel);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        loginCallback.onFail(e.getMessage()+"");
+                        loginCallback.onFail(e.getMessage() + "");
                     }
                 }
 

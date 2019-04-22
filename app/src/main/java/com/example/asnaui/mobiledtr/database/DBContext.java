@@ -69,6 +69,7 @@ public class DBContext extends SQLiteOpenHelper {
                 "id" + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                 "date" + " TEXT NOT NULL);"
         );
+      //  sqLiteDatabase.close();
 
     }
 
@@ -82,6 +83,7 @@ public class DBContext extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TBL_LEAVE);
             sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TBL_SO);
             sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TBL_CTO);
+            sqLiteDatabase.close();
         }
         // onCreate(sqLiteDatabase);
         Log.e("UPGRADE", "Database successfully upgraded " + "from " + 1 + " to " + i1);
@@ -263,7 +265,7 @@ public class DBContext extends SQLiteOpenHelper {
                 cursor.moveToNext();
             }
         }
-        // sqLiteDatabase.close();
+
         return list;
     }
 
@@ -284,17 +286,16 @@ public class DBContext extends SQLiteOpenHelper {
         return userModel;
     }
 
-    public void deleteLogs() {
+    public void deleteDateLog(String date) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        sqLiteDatabase.delete(TBL_DATE, null, null);
-        sqLiteDatabase.delete(TBL_LOGS, null, null);
+        sqLiteDatabase.delete(TBL_DATE, "date=?", new String[]{date});
         sqLiteDatabase.close();
     }
 
-    public void deleteLogs(String date, String time) {
+    public void deleteTimeLog(String date, String time) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        // sqLiteDatabase.delete(TBL_DATE, null, null);
-        sqLiteDatabase.delete(TBL_LOGS, "date=? AND time=?", new String[]{date, time});
+        int flag = sqLiteDatabase.delete(TBL_LOGS, "date=? AND time=?", new String[]{date, time});
+        Log.e("deleteLogs", flag + "");
         sqLiteDatabase.close();
     }
 
